@@ -1,57 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface Lesson {
   id: string;
   title: string;
-  status: "generating" | "generated";
+  status: "generating" | "generated" | "failed";
   outline: string;
   created_at: string;
+  content?: string;
+  error_message?: string;
 }
 
-export default function LandingPage() {
+interface LandingPageProps {
+  initialLessons: Lesson[];
+}
+
+export default function LandingPage({ initialLessons }: LandingPageProps) {
   const [outline, setOutline] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-
-  useEffect(() => {
-    const loadLessons = async () => {
-      console.log("🔍 Loading lessons on component mount...");
-      try {
-        console.log("🔍 Making request to /api/lessons...");
-        const response = await fetch("/api/lessons");
-        console.log("📡 Response status:", response.status);
-        console.log("📡 Response headers:", response.headers);
-
-        if (response.ok) {
-          console.log("✅ Response is OK, parsing JSON...");
-          const data = await response.json();
-          console.log("📝 Parsed data:", data);
-          setLessons(data.lessons);
-          console.log(
-            "✅ Lessons loaded successfully:",
-            data.lessons?.length || 0,
-            "lessons"
-          );
-        } else {
-          console.error(
-            "❌ Response not OK:",
-            response.status,
-            response.statusText
-          );
-          const text = await response.text();
-          console.error("❌ Response body:", text);
-        }
-      } catch (error) {
-        console.error("❌ Error loading lessons:", error);
-      }
-    };
-
-    loadLessons();
-  }, []);
+  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
 
   const handleGenerateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,18 +63,11 @@ export default function LandingPage() {
 
       setLessons((prev) => [lesson, ...prev]);
       setOutline("");
-      console.log("✅ Lesson added to list successfully");
+      setIsGenerating(false); // Set to false immediately after API call returns
+      console.log("✅ Lesson added to list successfully with initial status");
 
-      setTimeout(() => {
-        console.log("🔄 Simulating lesson completion...");
-        setLessons((prev) =>
-          prev.map((l) =>
-            l.id === lesson.id ? { ...l, status: "generated" as const } : l
-          )
-        );
-        setIsGenerating(false);
-        console.log("✅ Lesson status updated to generated");
-      }, 3000);
+      // The actual status update from 'generating' to 'generated' will now come via real-time subscription
+      // The previous setTimeout simulation is removed as it's no longer needed with real AI generation
     } catch (error) {
       console.error("❌ Error creating lesson:", error);
       setIsGenerating(false);

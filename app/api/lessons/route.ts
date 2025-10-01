@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { generateLessonContent } from "@/lib/ai/generate-lesson";
 
 export async function GET() {
   try {
@@ -65,7 +66,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ lesson }, { status: 201 });
+    console.log("✅ Successfully created lesson:", lesson);
+
+    console.log("🤖 Starting AI generation...");
+    const aiResult = await generateLessonContent(outline);
+
+    if (aiResult.success && aiResult.content) {
+      console.log("✅ AI generation successful, updating lesson...");
+
+      const { data: updatedLesson, error: updateError } = await supabase
+        .from("lessons")
+        .update({
+          content: aiResult.content,
+          status: "generated",
+          ai_prompt: `Create an interactive educational lesson for: ${outline}`,
+          ai_response: aiResult.content,
+          generation_trace: {
+            usage: aiResult.usage,
+            generated_at: new Date().toISOString(),
+            model: "gpt-4",
+          },
+        })
+        .eq("id", lesson.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error(
+          "❌ Failed to update lesson with AI content:",
+          updateError
+        );
+        return NextResponse.json({ lesson }, { status: 201 });
+      }
+
+      console.log("✅ Lesson updated with AI content:", updatedLesson);
+      return NextResponse.json({ lesson: updatedLesson }, { status: 201 });
+    } else {
+      console.error("❌ AI generation failed:", aiResult.error);
+
+      // Update lesson with error status
+      await supabase
+        .from("lessons")
+        .update({
+          status: "failed",
+          error_message: aiResult.error || "AI generation failed",
+        })
+        .eq("id", lesson.id);
+
+      return NextResponse.json({ lesson }, { status: 201 });
+    }
   } catch (error) {
     console.error("❌ Unexpected error in POST /api/lessons:", error);
     return NextResponse.json(

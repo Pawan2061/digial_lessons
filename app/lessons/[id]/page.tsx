@@ -16,10 +16,11 @@ interface Lesson {
   id: string;
   title: string;
   outline: string;
-  content: string;
-  status: "generating" | "generated";
+  content?: string;
+  status: "generating" | "generated" | "failed";
   created_at: string;
   updated_at: string;
+  error_message?: string;
 }
 
 export default function LessonPage() {
@@ -33,178 +34,25 @@ export default function LessonPage() {
     const fetchLesson = async () => {
       try {
         setLoading(true);
-        const mockLesson: Lesson = {
-          id: params.id as string,
-          title: "10-question pop quiz on Florida",
-          outline:
-            "A comprehensive quiz covering Florida's geography, history, culture, and notable landmarks",
-          content: `// Florida Geography Quiz
-import React, { useState } from 'react';
+        console.log("🔍 Fetching lesson with ID:", params.id);
 
-interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correct: number;
-  explanation: string;
-}
+        const response = await fetch(`/api/lessons/${params.id}`);
+        console.log("📡 Response status:", response.status);
 
-const FloridaQuiz: React.FC = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [showResult, setShowResult] = useState(false);
-  const [quizComplete, setQuizComplete] = useState(false);
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("Lesson not found");
+          }
+          throw new Error("Failed to fetch lesson");
+        }
 
-  const questions: Question[] = [
-    {
-      id: 1,
-      question: "What is the capital of Florida?",
-      options: ["Miami", "Orlando", "Tallahassee", "Jacksonville"],
-      correct: 2,
-      explanation: "Tallahassee has been Florida's capital since 1824."
-    },
-    {
-      id: 2,
-      question: "Which body of water borders Florida to the east?",
-      options: ["Gulf of Mexico", "Atlantic Ocean", "Caribbean Sea", "Lake Okeechobee"],
-      correct: 1,
-      explanation: "Florida is bordered by the Atlantic Ocean to the east and the Gulf of Mexico to the west."
-    },
-    {
-      id: 3,
-      question: "What is Florida's nickname?",
-      options: ["The Sunshine State", "The Orange State", "The Beach State", "The Alligator State"],
-      correct: 0,
-      explanation: "Florida is known as 'The Sunshine State' due to its warm, sunny climate."
-    },
-    {
-      id: 4,
-      question: "Which famous theme park is located in Orlando?",
-      options: ["Universal Studios", "Disney World", "SeaWorld", "All of the above"],
-      correct: 3,
-      explanation: "Orlando is home to Disney World, Universal Studios, and SeaWorld."
-    },
-    {
-      id: 5,
-      question: "What is the largest city in Florida by population?",
-      options: ["Miami", "Tampa", "Orlando", "Jacksonville"],
-      correct: 3,
-      explanation: "Jacksonville is Florida's most populous city with over 900,000 residents."
-    }
-  ];
-
-  const handleAnswerSelect = (answerIndex: number) => {
-    setSelectedAnswer(answerIndex);
-  };
-
-  const handleNext = () => {
-    if (selectedAnswer === questions[currentQuestion].correct) {
-      setScore(score + 1);
-    }
-    
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-    } else {
-      setQuizComplete(true);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setSelectedAnswer(null);
-    setScore(0);
-    setShowResult(false);
-    setQuizComplete(false);
-  };
-
-  if (quizComplete) {
-    return (
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Quiz Complete!</h2>
-        <div className="text-center mb-6">
-          <div className="text-4xl font-bold text-purple-600 mb-2">
-            {score}/{questions.length}
-          </div>
-          <p className="text-gray-600">
-            You scored {Math.round((score / questions.length) * 100)}%
-          </p>
-        </div>
-        <div className="space-y-2 mb-6">
-          {questions.map((q, index) => (
-            <div key={q.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-              <span className="font-medium">Question {index + 1}</span>
-              <span className="text-sm text-gray-600">{q.question}</span>
-            </div>
-          ))}
-        </div>
-        <Button 
-          onClick={resetQuiz}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-        >
-          Take Quiz Again
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Florida Geography Quiz</h1>
-        <p className="text-gray-600">Question {currentQuestion + 1} of {questions.length}</p>
-      </div>
-      
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          {questions[currentQuestion].question}
-        </h2>
-        <div className="space-y-3">
-          {questions[currentQuestion].options.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => handleAnswerSelect(index)}
-              className={\`w-full p-4 text-left border-2 rounded-lg transition-colors \${
-                selectedAnswer === index
-                  ? 'border-purple-500 bg-purple-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }\`}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {selectedAnswer !== null && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-700 mb-2">
-            <strong>Explanation:</strong> {questions[currentQuestion].explanation}
-          </p>
-        </div>
-      )}
-
-      <Button 
-        onClick={handleNext}
-        disabled={selectedAnswer === null}
-        className="w-full bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
-      >
-        {currentQuestion < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
-      </Button>
-    </div>
-  );
-};
-
-export default FloridaQuiz;`,
-          status: "generated",
-          created_at: "2024-01-15T10:30:00Z",
-          updated_at: "2024-01-15T10:35:00Z",
-        };
-
-        setLesson(mockLesson);
+        const data = await response.json();
+        console.log("📝 Fetched lesson data:", data);
+        const lesson = data.lesson;
+        setLesson(lesson);
       } catch (err) {
-        setError("Failed to load lesson");
+        console.error("❌ Error fetching lesson:", err);
+        setError(err instanceof Error ? err.message : "Failed to load lesson");
       } finally {
         setLoading(false);
       }
@@ -263,8 +111,20 @@ export default FloridaQuiz;`,
                 Digital Lessons
               </h1>
             </div>
-            <Badge className="bg-green-100 text-green-800">
-              {lesson.status === "generated" ? "Ready" : "Generating..."}
+            <Badge
+              className={
+                lesson.status === "generated"
+                  ? "bg-green-100 text-green-800"
+                  : lesson.status === "failed"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }
+            >
+              {lesson.status === "generated"
+                ? "Ready"
+                : lesson.status === "failed"
+                ? "Failed"
+                : "Generating..."}
             </Badge>
           </div>
         </div>
@@ -311,10 +171,16 @@ export default FloridaQuiz;`,
                     className={
                       lesson.status === "generated"
                         ? "bg-green-100 text-green-800"
+                        : lesson.status === "failed"
+                        ? "bg-red-100 text-red-800"
                         : "bg-yellow-100 text-yellow-800"
                     }
                   >
-                    {lesson.status === "generated" ? "Ready" : "Generating..."}
+                    {lesson.status === "generated"
+                      ? "Ready"
+                      : lesson.status === "failed"
+                      ? "Failed"
+                      : "Generating..."}
                   </Badge>
                 </div>
               </CardContent>
@@ -341,6 +207,61 @@ export default FloridaQuiz;`,
                       This may take a few moments
                     </p>
                   </div>
+                ) : lesson.status === "failed" ? (
+                  <div className="text-center py-12">
+                    <div className="text-red-500 mb-4">
+                      <svg
+                        className="mx-auto h-12 w-12"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Generation Failed
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {lesson.error_message ||
+                        "There was an error generating your lesson. Please try again."}
+                    </p>
+                    <Button
+                      onClick={() => window.location.reload()}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                ) : !lesson.content ? (
+                  <div className="text-center py-12">
+                    <div className="text-gray-400 mb-4">
+                      <svg
+                        className="mx-auto h-12 w-12"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No Content Available
+                    </h3>
+                    <p className="text-gray-600">
+                      This lesson doesn&apos;t have any generated content yet.
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-6">
                     {/* Code Preview */}
@@ -355,7 +276,6 @@ export default FloridaQuiz;`,
                       </div>
                     </div>
 
-                    {/* Rendered Component */}
                     <div>
                       <h3 className="font-medium text-gray-900 mb-3">
                         Live Preview
