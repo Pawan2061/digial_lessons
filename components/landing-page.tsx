@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -17,33 +17,99 @@ export default function LandingPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
 
+  useEffect(() => {
+    const loadLessons = async () => {
+      console.log("🔍 Loading lessons on component mount...");
+      try {
+        console.log("🔍 Making request to /api/lessons...");
+        const response = await fetch("/api/lessons");
+        console.log("📡 Response status:", response.status);
+        console.log("📡 Response headers:", response.headers);
+
+        if (response.ok) {
+          console.log("✅ Response is OK, parsing JSON...");
+          const data = await response.json();
+          console.log("📝 Parsed data:", data);
+          setLessons(data.lessons);
+          console.log(
+            "✅ Lessons loaded successfully:",
+            data.lessons?.length || 0,
+            "lessons"
+          );
+        } else {
+          console.error(
+            "❌ Response not OK:",
+            response.status,
+            response.statusText
+          );
+          const text = await response.text();
+          console.error("❌ Response body:", text);
+        }
+      } catch (error) {
+        console.error("❌ Error loading lessons:", error);
+      }
+    };
+
+    loadLessons();
+  }, []);
+
   const handleGenerateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!outline.trim()) return;
 
+    console.log("🔍 Starting lesson generation...");
     setIsGenerating(true);
 
-    const newLesson: Lesson = {
-      id: Date.now().toString(),
-      title: outline.length > 60 ? outline.substring(0, 60) + "..." : outline,
-      status: "generating",
-      outline: outline.trim(),
-      created_at: new Date().toISOString(),
-    };
+    try {
+      console.log("🔍 Making POST request to /api/lessons...");
+      console.log("📝 Sending outline:", outline.trim());
 
-    setLessons((prev) => [newLesson, ...prev]);
-    setOutline("");
+      const response = await fetch("/api/lessons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ outline: outline.trim() }),
+      });
 
-    setTimeout(() => {
-      setLessons((prev) =>
-        prev.map((lesson) =>
-          lesson.id === newLesson.id
-            ? { ...lesson, status: "generated" as const }
-            : lesson
-        )
-      );
+      console.log("📡 Response status:", response.status);
+      console.log("📡 Response headers:", response.headers);
+
+      if (!response.ok) {
+        console.error(
+          "❌ Response not OK:",
+          response.status,
+          response.statusText
+        );
+        const text = await response.text();
+        console.error("❌ Response body:", text);
+        throw new Error("Failed to create lesson");
+      }
+
+      console.log("✅ Response is OK, parsing JSON...");
+      const data = await response.json();
+      console.log("📝 Parsed data:", data);
+      const { lesson } = data;
+
+      setLessons((prev) => [lesson, ...prev]);
+      setOutline("");
+      console.log("✅ Lesson added to list successfully");
+
+      setTimeout(() => {
+        console.log("🔄 Simulating lesson completion...");
+        setLessons((prev) =>
+          prev.map((l) =>
+            l.id === lesson.id ? { ...l, status: "generated" as const } : l
+          )
+        );
+        setIsGenerating(false);
+        console.log("✅ Lesson status updated to generated");
+      }, 3000);
+    } catch (error) {
+      console.error("❌ Error creating lesson:", error);
       setIsGenerating(false);
-    }, 3000);
+      // TODO: Show error message to user
+    }
   };
 
   const handleViewLesson = (lessonId: string) => {
