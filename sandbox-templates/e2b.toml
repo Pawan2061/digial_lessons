@@ -1,0 +1,16 @@
+# This is a config for E2B sandbox template.
+# You can use template ID (imzbqis0w9g0dhvg0a7s) or template name (digital_lessons) to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox("digital_lessons") # Sync sandbox
+# sandbox = await AsyncSandbox.create("digital_lessons") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('digital_lessons')
+
+team_id = "e7287e9f-8a87-47cb-8b3b-cbb411270082"
+dockerfile = "e2b.Dockerfile"
+template_name = "digital_lessons"
+template_id = "imzbqis0w9g0dhvg0a7s"
