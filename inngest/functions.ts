@@ -13,12 +13,12 @@ export const executeLesson = inngest.createFunction(
   {
     id: "execute-lesson",
     name: "Execute Lesson",
+    retries: 0,
   },
   { event: "lesson/execute" },
   async ({ event, step }) => {
     const { lessonId } = event.data as ExecuteLessonEvent["data"];
 
-    // Step 1: Fetch the lesson from Supabase
     const lesson = await step.run("fetch-lesson", async () => {
       const supabase = await createClient();
       const { data, error } = await supabase
@@ -48,18 +48,27 @@ export const executeLesson = inngest.createFunction(
       };
     });
 
-    await step.run("write-code-to-sandbox", async () => {
+    await step.run("deploy-code-to-sandbox", async () => {
+      console.log("📝 Deploying code to sandbox");
       const sandbox = await Sandbox.connect(sandboxInfo.id);
+      const cleanedContent = cleanGeneratedCode(lesson.content);
 
-      try {
-        const cleanedContent = cleanGeneratedCode(lesson.content);
+      await sandbox.files.write("/home/user/app/page.tsx", cleanedContent);
+      console.log("✅ Code written successfully");
 
-        await sandbox.files.write("/home/user/app/page.tsx", cleanedContent);
+      sandbox.commands
+        .run(
+          "cd /home/user && nohup npx next dev --turbopack -H 0.0.0.0 > /tmp/nextjs.log 2>&1 &"
+        )
+        .catch((err) => {
+          console.warn("Server start command warning (non-critical):", err);
+        });
 
-        console.log("✅ Successfully wrote code to sandbox page.tsx");
-      } finally {
-        console.log(`🎉 Sandbox ready at: ${sandboxInfo.url}`);
-      }
+      console.log("🚀 Dev server starting in background");
+      console.log(`🎉 Sandbox ready at: ${sandboxInfo.url}`);
+      console.log(
+        "⏳ Note: First page load will take 30-60s while server compiles"
+      );
     });
 
     await step.run("update-lesson-with-sandbox", async () => {
@@ -75,8 +84,12 @@ export const executeLesson = inngest.createFunction(
 
       if (error) {
         console.error("⚠️ Failed to update lesson with sandbox info:", error);
+      } else {
+        console.log("✅ Lesson updated with sandbox info");
       }
     });
+
+    console.log("🎉 Deployment complete! Sandbox URL:", sandboxInfo.url);
 
     return {
       lessonId,
@@ -87,31 +100,37 @@ export const executeLesson = inngest.createFunction(
   }
 );
 
-/**
- * Cleans AI-generated code to ensure it's a valid Next.js page component
- */
 function cleanGeneratedCode(content: string): string {
-  // Remove markdown code blocks if present
   let cleaned = content.trim();
 
-  // Remove ```typescript, ```tsx, ```jsx, ```ts, ```js markers
   cleaned = cleaned.replace(
     /^```(?:typescript|tsx|jsx|ts|js|react)?\s*\n/i,
     ""
   );
   cleaned = cleaned.replace(/\n```\s*$/, "");
 
-  // Ensure the component has proper React imports if missing
+  const lines = cleaned.split("\n");
+  const filteredLines = lines.filter((line) => {
+    const trimmed = line.trim();
+    if (
+      trimmed.startsWith("Here") ||
+      trimmed.startsWith("Please") ||
+      trimmed.startsWith("Note that") ||
+      trimmed.startsWith("Make sure")
+    ) {
+      return false;
+    }
+    return true;
+  });
+  cleaned = filteredLines.join("\n");
+
   if (!cleaned.includes("import React") && !cleaned.includes("'react'")) {
     cleaned = `'use client';\n\nimport React from 'react';\n\n${cleaned}`;
   } else if (!cleaned.includes("'use client'")) {
-    // Add 'use client' directive if not present
     cleaned = `'use client';\n\n${cleaned}`;
   }
 
-  // Ensure there's a default export
   if (!cleaned.includes("export default")) {
-    // Try to find the main component name
     const componentMatch = cleaned.match(/(?:function|const)\s+([A-Z]\w+)/);
     if (componentMatch) {
       cleaned += `\n\nexport default ${componentMatch[1]};`;

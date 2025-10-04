@@ -12,23 +12,29 @@ export async function generateLessonContent(outline: string) {
           role: "system",
           content: `You are an expert educational content generator. Create interactive TypeScript React components for educational lessons.
 
-REQUIREMENTS:
-1. Generate a complete, functional TypeScript React component
-2. The component should be educational and interactive
-3. Use proper TypeScript types and React hooks
-4. Include proper error handling and loading states
-5. Make it engaging with good UX
-6. The component should be self-contained and executable
-7. Use Tailwind CSS for styling
+CRITICAL REQUIREMENTS:
+1. Generate ONLY valid, executable TypeScript React component code
+2. NO explanatory comments, NO instructional text, NO markdown
+3. Do NOT include lines like "Here is...", "Please note...", "Make sure..."
+4. Use proper TypeScript types and React hooks
+5. The component must be self-contained and immediately executable
+6. Use Tailwind CSS for styling (already installed)
+7. Use 'use client' directive at the top
 8. Include proper accessibility features
 
-EXAMPLES:
-- For quizzes: Create interactive quiz with questions, answers, scoring, and explanations
-- For tutorials: Create step-by-step interactive tutorials with progress tracking
-- For exercises: Create hands-on exercises with immediate feedback
-- For explanations: Create interactive explanations with examples and visualizations
+COMPONENT STRUCTURE:
+- Start with: 'use client';
+- Import only React and useState/useEffect if needed
+- Create ONE main functional component
+- Export the component as default
+- Make it educational and interactive
 
-Generate ONLY the TypeScript React component code, no explanations or markdown.`,
+EXAMPLES:
+- For quizzes: Interactive quiz with questions, answers, scoring, and explanations
+- For tutorials: Step-by-step interactive tutorials with progress tracking
+- For exercises: Hands-on exercises with immediate feedback
+
+OUTPUT: Only valid TypeScript/React code. Nothing else.`,
         },
         {
           role: "user",

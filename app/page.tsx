@@ -1,7 +1,7 @@
 import LandingPage from "@/components/landing-page";
 
 export default async function Home() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001";
   const response = await fetch(`${baseUrl}/api/lessons`, {
     cache: "no-store",
   });
