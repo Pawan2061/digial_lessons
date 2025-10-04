@@ -103,33 +103,91 @@ export const executeLesson = inngest.createFunction(
 function cleanGeneratedCode(content: string): string {
   let cleaned = content.trim();
 
+  // Remove markdown code blocks
   cleaned = cleaned.replace(
     /^```(?:typescript|tsx|jsx|ts|js|react)?\s*\n/i,
     ""
   );
   cleaned = cleaned.replace(/\n```\s*$/, "");
 
+  // Aggressively remove explanatory text and comments
   const lines = cleaned.split("\n");
-  const filteredLines = lines.filter((line) => {
+  const filteredLines: string[] = [];
+  let inMultiLineComment = false;
+
+  for (const line of lines) {
     const trimmed = line.trim();
-    if (
-      trimmed.startsWith("Here") ||
-      trimmed.startsWith("Please") ||
-      trimmed.startsWith("Note that") ||
-      trimmed.startsWith("Make sure")
-    ) {
-      return false;
+
+    // Skip empty lines at the start
+    if (filteredLines.length === 0 && !trimmed) continue;
+
+    // Detect multi-line comment start
+    if (trimmed.startsWith("/*") && !trimmed.includes("*/")) {
+      inMultiLineComment = true;
+      continue;
     }
-    return true;
-  });
+
+    // Detect multi-line comment end
+    if (inMultiLineComment) {
+      if (trimmed.includes("*/")) {
+        inMultiLineComment = false;
+      }
+      continue;
+    }
+
+    // Skip single-line comments that look like explanations
+    if (trimmed.startsWith("//")) {
+      continue;
+    }
+
+    // Skip lines that look like plain English explanations (no code patterns)
+    // These lines typically don't have brackets, semicolons, or equals signs
+    const looksLikeExplanation =
+      trimmed.length > 0 &&
+      !trimmed.startsWith("import") &&
+      !trimmed.startsWith("export") &&
+      !trimmed.startsWith("const") &&
+      !trimmed.startsWith("let") &&
+      !trimmed.startsWith("var") &&
+      !trimmed.startsWith("function") &&
+      !trimmed.startsWith("class") &&
+      !trimmed.startsWith("interface") &&
+      !trimmed.startsWith("type") &&
+      !trimmed.startsWith("<") && // JSX
+      !trimmed.startsWith("}") &&
+      !trimmed.includes("(") &&
+      !trimmed.includes("{") &&
+      !trimmed.includes("=") &&
+      !trimmed.includes(";") &&
+      !trimmed.includes("return") &&
+      !trimmed.startsWith("'use") &&
+      (trimmed.startsWith("This") ||
+        trimmed.startsWith("Here") ||
+        trimmed.startsWith("Please") ||
+        trimmed.startsWith("Note") ||
+        trimmed.startsWith("The") ||
+        trimmed.startsWith("A ") ||
+        trimmed.startsWith("An ") ||
+        trimmed.match(/^[A-Z][a-z]+ [a-z]/)); // Sentence-like pattern
+
+    if (looksLikeExplanation) {
+      console.log("🧹 Removed explanation line:", trimmed.substring(0, 80));
+      continue;
+    }
+
+    filteredLines.push(line);
+  }
+
   cleaned = filteredLines.join("\n");
 
+  // Ensure proper React setup
   if (!cleaned.includes("import React") && !cleaned.includes("'react'")) {
     cleaned = `'use client';\n\nimport React from 'react';\n\n${cleaned}`;
   } else if (!cleaned.includes("'use client'")) {
     cleaned = `'use client';\n\n${cleaned}`;
   }
 
+  // Ensure default export
   if (!cleaned.includes("export default")) {
     const componentMatch = cleaned.match(/(?:function|const)\s+([A-Z]\w+)/);
     if (componentMatch) {
