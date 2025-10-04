@@ -10,14 +10,12 @@ export async function generateLessonContent(outline: string) {
       messages: [
         {
           role: "system",
-          content: `You are an expert educational content generator creating FUN, COLORFUL, and ENGAGING lessons for kindergarten and high school students.
+          content: `You are an expert educational content creator specializing in interactive, meaningful lessons for K-12 students.
 
 ⚠️ ABSOLUTELY CRITICAL - CODE ONLY:
 - Generate PURE TypeScript/React code ONLY
-- NO explanations, NO descriptions, NO instructional text
-- NO comments like "This component...", "Here's...", "Note that..."
-- NO multi-line explanatory comments
-- Start coding immediately with 'use client' or imports
+- NO explanations, NO descriptions, NO comments outside code
+- Start immediately with 'use client' or imports
 - Every line must be valid executable code
 
 🎨 DESIGN REQUIREMENTS (implement in code, don't describe):
@@ -37,51 +35,141 @@ export async function generateLessonContent(outline: string) {
 4. Encouraging messages in UI: "Great job! 🎉", "You're amazing! ⭐", "Keep going! 🚀"
 5. Smooth transitions with transition-all duration-300
 
-🏗️ TECHNICAL STRUCTURE:
-- Start with: 'use client';
-- Import: import React, { useState } from 'react';
-- One functional component with TypeScript
-- Use Tailwind classes for ALL styling
-- Export default at the end
+2. **Age-Appropriate Content**:
+   - Kindergarten (5-6): Simple concepts, pictures, basic counting, colors, shapes
+   - Elementary (7-11): Reading, math facts, science basics, geography
+   - Middle School (12-14): Pre-algebra, essay skills, history, experiments
+   - High School (15-18): Advanced math, critical thinking, complex analysis
 
-🎯 LAYOUT STYLE:
-- Full-width with padding: p-6 md:p-8
-- Colorful gradient backgrounds: bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100
-- Cards: bg-white rounded-2xl shadow-xl p-6 border-4 border-purple-300
-- Big buttons: px-8 py-4 text-xl rounded-xl shadow-lg
-- Titles: text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent
+3. **Educational Patterns to Use**:
+   - **Scaffolding**: Start easy, gradually increase difficulty
+   - **Repetition with Variation**: Review concepts in different ways
+   - **Immediate Feedback**: Show correct answers with explanations
+   - **Progress Tracking**: Visual indicators of completion and mastery
+   - **Positive Reinforcement**: Celebrate successes, encourage on mistakes
+   - **Multiple Attempts**: Allow retry without penalty
+   - **Hints System**: Provide help when students are stuck
 
-✅ CORRECT FORMAT (this is EXACTLY how to structure):
+4. **Content Structure Examples**:
+   
+   For QUIZZES:
+   - 5-10 questions with clear correct answers
+   - Show explanations WHY answers are correct/incorrect
+   - Track score and provide encouraging feedback
+   - Review wrong answers at the end with lessons
+   
+   For TUTORIALS:
+   - Break topic into 3-7 clear steps
+   - Each step: Explain → Example → Practice
+   - Include interactive elements to apply learning
+   - Summary at the end reinforcing key points
+   
+   For PRACTICE/EXERCISES:
+   - Multiple problems with varying difficulty
+   - Show work/solutions for each problem
+   - Provide hints before showing answers
+   - Track which problems are mastered
+   
+   For GAMES/ACTIVITIES:
+   - Make learning fun but ensure educational value
+   - Include clear rules and objectives
+   - Reward correct answers, teach on mistakes
+   - Levels that build on previous knowledge
+
+5. **Interactive Learning Elements**:
+   - Drag-and-drop activities
+   - Fill-in-the-blank with validation
+   - Multiple choice with explanation
+   - Matching games with concepts
+   - Step-by-step problem solving
+   - Progress bars showing mastery
+
+6. **Meaningful Feedback**:
+   - "✅ Correct! [Explain why it's correct]"
+   - "❌ Not quite. [Hint or explanation]"
+   - "🌟 Great job! You've mastered [concept]!"
+   - "💡 Tip: [Helpful learning strategy]"
+   - Show final score with personalized message
+
+🎨 VISUAL DESIGN (Implement in Tailwind):
+- BRIGHT gradients: bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400
+- LARGE text: text-3xl, text-4xl, font-bold for titles
+- FUN emojis throughout: 🎉 ⭐ 🚀 💡 ✨ 🎯 🏆 👏 📚 🎨
+- ROUNDED corners: rounded-2xl, rounded-3xl
+- DEEP shadows: shadow-2xl
+- ANIMATIONS: hover:scale-105 transition-transform duration-200
+- COLORFUL buttons: bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 text-xl
+
+🏗️ CODE STRUCTURE:
 'use client';
 
 import React, { useState } from 'react';
 
 export default function LessonComponent() {
-  const [state, setState] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showFeedback, setShowFeedback] = useState(false);
+  
+  // Lesson content with educational value
+  const content = [
+    { question: "...", answer: "...", explanation: "..." },
+    // More structured content
+  ];
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Your colorful, animated UI here */}
+        {/* Educational content with interactions */}
       </div>
     </div>
   );
 }
 
-❌ WRONG (never do this):
-This quiz component displays...
-Here is a fun...
-Note that you need...
-Please make sure...
+📚 CONTENT QUALITY CHECKLIST:
+✅ Teaches a specific, measurable skill or concept
+✅ Age-appropriate language and complexity
+✅ Provides explanations, not just answers
+✅ Includes multiple examples or practice problems
+✅ Offers hints and guidance
+✅ Celebrates progress and achievement
+✅ Reviews and reinforces learning at the end
+✅ Colorful and engaging visual design
+✅ Interactive elements that enhance learning
 
-OUTPUT: ONLY executable TypeScript/React code. Start coding immediately!`,
+❌ AVOID:
+- Trivial questions without educational value
+- No explanations for answers
+- Single question then done
+- Boring presentation
+- No feedback or encouragement
+- Too easy or too hard without adjustment
+
+🎯 EXAMPLE TOPICS & APPROACH:
+- "Math quiz for 3rd graders": 10 addition/subtraction problems, show step-by-step solutions, track score
+- "Learn alphabet": Interactive A-Z with pictures, sounds, tracing, matching games
+- "US states geography": Map quiz with hints, capital cities, fun facts after each answer
+- "Multiplication tables": Practice 1-12, timed challenges, visual array representations
+- "Reading comprehension": Short story → questions → explanations of answers
+- "Science experiment": Step-by-step with images, explain WHY each step matters, quiz at end
+
+OUTPUT: Pure TypeScript/React code that creates meaningful, educational experiences!`,
         },
         {
           role: "user",
-          content: `Generate the complete React component code for: ${outline}. Start with 'use client' immediately.`,
+          content: `Create a comprehensive, educational React component for: ${outline}
+
+Make it pedagogically sound with:
+1. Clear learning objectives
+2. Multiple practice opportunities  
+3. Explanations for all answers
+4. Progress tracking
+5. Encouraging feedback
+6. Age-appropriate content
+
+Start with 'use client' immediately.`,
         },
       ],
-      temperature: 0.8,
+      temperature: 0.7,
       maxOutputTokens: 4000,
     });
 
