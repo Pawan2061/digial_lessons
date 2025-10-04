@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { generateLessonContent } from "@/lib/ai/generate-lesson";
+import { inngest } from "@/inngest.config";
 
 export async function GET() {
   try {
@@ -100,6 +101,16 @@ export async function POST(request: NextRequest) {
       }
 
       console.log("✅ Lesson updated with AI content:", updatedLesson);
+
+      // Trigger Inngest function to execute the lesson in E2B sandbox
+      console.log("🚀 Triggering lesson execution in sandbox...");
+      await inngest.send({
+        name: "lesson/execute",
+        data: {
+          lessonId: updatedLesson.id,
+        },
+      });
+
       return NextResponse.json({ lesson: updatedLesson }, { status: 201 });
     } else {
       console.error("❌ AI generation failed:", aiResult.error);

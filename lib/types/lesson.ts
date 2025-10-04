@@ -8,6 +8,9 @@ export interface Lesson {
   ai_prompt?: string;
   ai_response?: string;
   generation_trace?: any;
+  sandbox_id?: string;
+  sandbox_url?: string;
+  executed_at?: string;
 }
 
 export interface CreateLessonRequest {
