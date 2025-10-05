@@ -32,30 +32,27 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sandboxLoading, setSandboxLoading] = useState(true);
+  const [sandboxError, setSandboxError] = useState(false);
   const [countdown, setCountdown] = useState(10);
+  const [recreating, setRecreating] = useState(false);
 
   useEffect(() => {
     const fetchLesson = async () => {
       try {
         setLoading(true);
-        console.log("🔍 Fetching lesson with ID:", params.id);
-
         const response = await fetch(`/api/lessons/${params.id}`);
-        console.log("📡 Response status:", response.status);
 
         if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Lesson not found");
-          }
-          throw new Error("Failed to fetch lesson");
+          throw new Error(
+            response.status === 404
+              ? "Lesson not found"
+              : "Failed to fetch lesson"
+          );
         }
 
         const data = await response.json();
-        console.log("📝 Fetched lesson data:", data);
-        const lesson = data.lesson;
-        setLesson(lesson);
+        setLesson(data.lesson);
       } catch (err) {
-        console.error("❌ Error fetching lesson:", err);
         setError(err instanceof Error ? err.message : "Failed to load lesson");
       } finally {
         setLoading(false);
@@ -77,16 +74,15 @@ export default function LessonPage() {
           const data = await response.json();
           setLesson(data.lesson);
         }
-      } catch (err) {
-        console.error("Error polling lesson:", err);
-      }
+      } catch {}
     }, 3000);
 
     return () => clearInterval(pollInterval);
   }, [lesson, params.id]);
 
   useEffect(() => {
-    if (!lesson?.sandbox_url || lesson.status !== "generated") return;
+    if (!lesson?.sandbox_url || lesson.status !== "generated" || sandboxError)
+      return;
 
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => {
@@ -100,7 +96,45 @@ export default function LessonPage() {
     }, 1000);
 
     return () => clearInterval(countdownInterval);
-  }, [lesson?.sandbox_url, lesson?.status]);
+  }, [lesson?.sandbox_url, lesson?.status, sandboxError]);
+
+  const handleRecreateSandbox = async () => {
+    if (!lesson?.content) return;
+
+    setRecreating(true);
+    setSandboxError(false);
+    setSandboxLoading(true);
+    setCountdown(10);
+
+    try {
+      const response = await fetch("/api/inngest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "lesson/execute",
+          data: { lessonId: lesson.id },
+        }),
+      });
+
+      if (response.ok) {
+        setTimeout(async () => {
+          const lessonResponse = await fetch(`/api/lessons/${params.id}`);
+          if (lessonResponse.ok) {
+            const data = await lessonResponse.json();
+            setLesson(data.lesson);
+          }
+          setRecreating(false);
+        }, 5000);
+      } else {
+        setRecreating(false);
+        alert("Failed to recreate sandbox. Please try refreshing the page.");
+      }
+    } catch (err) {
+      console.error("Failed to recreate sandbox:", err);
+      setRecreating(false);
+      alert("Failed to recreate sandbox. Please try refreshing the page.");
+    }
+  };
 
   if (loading) {
     return (
@@ -234,87 +268,40 @@ export default function LessonPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div
-                className="relative bg-gray-50 rounded-lg overflow-hidden"
-                style={{ height: "700px" }}
-              >
-                {sandboxLoading ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 z-10">
-                    <div className="text-center max-w-lg px-6">
-                      <div className="relative w-32 h-32 mx-auto mb-8">
-                        <svg className="w-32 h-32 transform -rotate-90">
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="56"
-                            stroke="#e5e7eb"
-                            strokeWidth="8"
-                            fill="none"
-                          />
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="56"
-                            stroke="#7c3aed"
-                            strokeWidth="8"
-                            fill="none"
-                            strokeDasharray={`${
-                              (countdown / 10) * 351.86
-                            } 351.86`}
-                            className="transition-all duration-1000 ease-linear"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="text-5xl font-bold text-purple-600">
-                              {countdown}
-                            </div>
-                            <div className="text-sm text-gray-600">seconds</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                        Starting Your Sandbox
-                      </h3>
-                      <p className="text-gray-600 mb-4">
-                        We&apos;re booting up the Next.js dev server and
-                        compiling your interactive lesson...
-                      </p>
-
-                      {/* Progress indicators */}
-                      <div className="space-y-2 text-sm text-left bg-white rounded-lg p-4 shadow-sm">
-                        <div className="flex items-center text-green-600">
+              {sandboxError ? (
+                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-12 border-2 border-orange-200">
+                  <div className="max-w-md mx-auto text-center">
+                    <div className="text-orange-500 mb-6">
+                      <svg
+                        className="w-20 h-20 mx-auto"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                      Sandbox Expired 😴
+                    </h3>
+                    <p className="text-gray-700 mb-6 leading-relaxed">
+                      This lesson&apos;s sandbox has stopped running. Don&apos;t
+                      worry - we can restart it with one click!
+                    </p>
+                    <Button
+                      onClick={handleRecreateSandbox}
+                      disabled={recreating}
+                      className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                    >
+                      {recreating ? (
+                        <span className="flex items-center">
                           <svg
-                            className="w-5 h-5 mr-2"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>Lesson generated</span>
-                        </div>
-                        <div className="flex items-center text-green-600">
-                          <svg
-                            className="w-5 h-5 mr-2"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>Sandbox created</span>
-                        </div>
-                        <div className="flex items-center text-purple-600">
-                          <svg
-                            className="animate-spin w-5 h-5 mr-2"
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
                             fill="none"
                             viewBox="0 0 24 24"
                           >
@@ -332,27 +319,144 @@ export default function LessonPage() {
                               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                             />
                           </svg>
-                          <span>
-                            Starting dev server & compiling React components...
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="text-xs text-gray-500 mt-6">
-                        💡 First-time loads may take a bit longer while
-                        everything initializes
-                      </p>
-                    </div>
+                          Restarting...
+                        </span>
+                      ) : (
+                        <>🚀 Restart Sandbox</>
+                      )}
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-4">
+                      Takes about 30-60 seconds
+                    </p>
                   </div>
-                ) : (
-                  <iframe
-                    src={lesson.sandbox_url}
-                    className="w-full h-full border-0"
-                    title="Interactive Lesson"
-                    sandbox="allow-scripts allow-same-origin allow-forms"
-                  />
-                )}
-              </div>
+                </div>
+              ) : (
+                <div
+                  className="relative bg-gray-50 rounded-lg overflow-hidden"
+                  style={{ height: "700px" }}
+                >
+                  {sandboxLoading ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 z-10">
+                      <div className="text-center max-w-lg px-6">
+                        <div className="relative w-32 h-32 mx-auto mb-8">
+                          <svg className="w-32 h-32 transform -rotate-90">
+                            <circle
+                              cx="64"
+                              cy="64"
+                              r="56"
+                              stroke="#e5e7eb"
+                              strokeWidth="8"
+                              fill="none"
+                            />
+                            <circle
+                              cx="64"
+                              cy="64"
+                              r="56"
+                              stroke="#7c3aed"
+                              strokeWidth="8"
+                              fill="none"
+                              strokeDasharray={`${
+                                (countdown / 10) * 351.86
+                              } 351.86`}
+                              className="transition-all duration-1000 ease-linear"
+                            />
+                          </svg>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="text-5xl font-bold text-purple-600">
+                                {countdown}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                seconds
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                          Starting Your Sandbox
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          We&apos;re booting up the Next.js dev server and
+                          compiling your interactive lesson...
+                        </p>
+
+                        <div className="space-y-2 text-sm text-left bg-white rounded-lg p-4 shadow-sm">
+                          <div className="flex items-center text-green-600">
+                            <svg
+                              className="w-5 h-5 mr-2"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span>Lesson generated</span>
+                          </div>
+                          <div className="flex items-center text-green-600">
+                            <svg
+                              className="w-5 h-5 mr-2"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <span>Sandbox created (24hr lifetime)</span>
+                          </div>
+                          <div className="flex items-center text-purple-600">
+                            <svg
+                              className="animate-spin w-5 h-5 mr-2"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              />
+                            </svg>
+                            <span>Starting dev server & compiling...</span>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-500 mt-6">
+                          💡 First-time loads may take a bit longer while
+                          everything initializes
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      src={lesson.sandbox_url}
+                      className="w-full h-full border-0"
+                      title="Interactive Lesson"
+                      sandbox="allow-scripts allow-same-origin allow-forms"
+                      onError={() => {
+                        console.error(
+                          "Iframe failed to load - sandbox might be dead"
+                        );
+                        setSandboxError(true);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-start">
                   <svg
@@ -371,10 +475,10 @@ export default function LessonPage() {
                   <div className="text-sm text-blue-700">
                     <p className="font-medium mb-1">About this lesson</p>
                     <p>
-                      This is an interactive lesson running in a live E2B
-                      sandbox. You can interact with all the elements. If it
-                      doesn&apos;t load after the countdown, please refresh the
-                      page.
+                      This interactive lesson runs in a live E2B sandbox with a{" "}
+                      <strong>24-hour lifetime</strong>. You can interact with
+                      all elements. If the sandbox expires, just click the
+                      restart button above!
                     </p>
                   </div>
                 </div>
@@ -404,8 +508,7 @@ export default function LessonPage() {
                   No Sandbox URL Available
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  This lesson doesn&apos;t have a sandbox URL yet. Try
-                  refreshing the page.
+                  This lesson doesn&apos;t have a sandbox URL yet.
                 </p>
                 <Button
                   onClick={() => window.location.reload()}

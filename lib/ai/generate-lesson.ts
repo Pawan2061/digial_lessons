@@ -10,163 +10,205 @@ export async function generateLessonContent(outline: string) {
       messages: [
         {
           role: "system",
-          content: `You are an expert educational content creator specializing in interactive, meaningful lessons for K-12 students.
+          content: `You are an expert at creating SAFE, BUG-FREE, educational React components for children.
 
-⚠️ ABSOLUTELY CRITICAL - CODE ONLY:
-- Generate PURE TypeScript/React code ONLY
-- NO explanations, NO descriptions, NO comments outside code
-- Start immediately with 'use client' or imports
-- Every line must be valid executable code
+⚠️ CRITICAL RULES - NO EXCEPTIONS:
+1. Generate ONLY valid TypeScript/React code
+2. NO comments or explanations
+3. Start with 'use client' immediately
+4. Use DEFENSIVE programming - check for undefined/null
+5. ALL data structures must be TYPED and VALIDATED
 
-🎨 DESIGN REQUIREMENTS (implement in code, don't describe):
-1. Use BRIGHT, VIBRANT colors - blues, purples, greens, yellows, pinks, oranges
-2. Create LARGE, BOLD text (text-2xl, text-3xl, text-4xl, font-bold, font-black)
-3. Add COLORFUL gradients (bg-gradient-to-r from-blue-500 to-purple-600)
-4. Include FUN EMOJIS throughout: 🎉 🌟 🚀 💡 ✨ 🎯 🏆 👏 🎨 🎮
-5. Use ROUNDED corners everywhere (rounded-xl, rounded-2xl)
-6. Add SHADOWS and DEPTH (shadow-lg, shadow-xl, shadow-2xl)
-7. Create ANIMATED elements (hover:scale-105, transition-all, animate-bounce)
-8. Use COLORFUL BUTTONS with gradients and hover effects
+🛡️ CODE SAFETY REQUIREMENTS:
 
-🎮 INTERACTIVITY (implement in code):
-1. Click animations with visual feedback
-2. Progress bars, counters, score displays
-3. Celebration effects when correct
-4. Encouraging messages in UI: "Great job! 🎉", "You're amazing! ⭐", "Keep going! 🚀"
-5. Smooth transitions with transition-all duration-300
+1. **Always Define Data Structures First:**
+\`\`\`typescript
+'use client';
+import React, { useState } from 'react';
 
-2. **Age-Appropriate Content**:
-   - Kindergarten (5-6): Simple concepts, pictures, basic counting, colors, shapes
-   - Elementary (7-11): Reading, math facts, science basics, geography
-   - Middle School (12-14): Pre-algebra, essay skills, history, experiments
-   - High School (15-18): Advanced math, critical thinking, complex analysis
+export default function LessonComponent() {
+  // Define typed data at the top
+  const questions = [
+    { question: "What is 2+2?", options: ["3", "4", "5"], answer: 1, explanation: "2+2=4" },
+    { question: "What is 3+3?", options: ["5", "6", "7"], answer: 1, explanation: "3+3=6" }
+  ];
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  
+  // Always check bounds before accessing arrays
+  const current = questions[currentIndex];
+  if (!current) return <div>Loading...</div>;
+  
+  return <div>{current.question}</div>;
+}
+\`\`\`
 
-3. **Educational Patterns to Use**:
-   - **Scaffolding**: Start easy, gradually increase difficulty
-   - **Repetition with Variation**: Review concepts in different ways
-   - **Immediate Feedback**: Show correct answers with explanations
-   - **Progress Tracking**: Visual indicators of completion and mastery
-   - **Positive Reinforcement**: Celebrate successes, encourage on mistakes
-   - **Multiple Attempts**: Allow retry without penalty
-   - **Hints System**: Provide help when students are stuck
+2. **Always Use Safe Array Access:**
+- ✅ CORRECT: \`const item = items[index]; if (!item) return null;\`
+- ❌ WRONG: \`items[index].property\` (no safety check)
 
-4. **Content Structure Examples**:
-   
-   For QUIZZES:
-   - 5-10 questions with clear correct answers
-   - Show explanations WHY answers are correct/incorrect
-   - Track score and provide encouraging feedback
-   - Review wrong answers at the end with lessons
-   
-   For TUTORIALS:
-   - Break topic into 3-7 clear steps
-   - Each step: Explain → Example → Practice
-   - Include interactive elements to apply learning
-   - Summary at the end reinforcing key points
-   
-   For PRACTICE/EXERCISES:
-   - Multiple problems with varying difficulty
-   - Show work/solutions for each problem
-   - Provide hints before showing answers
-   - Track which problems are mastered
-   
-   For GAMES/ACTIVITIES:
-   - Make learning fun but ensure educational value
-   - Include clear rules and objectives
-   - Reward correct answers, teach on mistakes
-   - Levels that build on previous knowledge
+3. **Always Validate Props/State:**
+- Check if data exists before using it
+- Use optional chaining: \`data?.property\`
+- Provide fallback values
 
-5. **Interactive Learning Elements**:
-   - Drag-and-drop activities
-   - Fill-in-the-blank with validation
-   - Multiple choice with explanation
-   - Matching games with concepts
-   - Step-by-step problem solving
-   - Progress bars showing mastery
+4. **Use Simple, Reliable Patterns:**
+- State for tracking progress: \`const [step, setStep] = useState(0)\`
+- Arrays for content: \`const content = [{...}, {...}]\`
+- Conditional rendering: \`{condition && <Component />}\`
+- Safe navigation: \`{step < content.length && content[step]}\`
 
-6. **Meaningful Feedback**:
-   - "✅ Correct! [Explain why it's correct]"
-   - "❌ Not quite. [Hint or explanation]"
-   - "🌟 Great job! You've mastered [concept]!"
-   - "💡 Tip: [Helpful learning strategy]"
-   - Show final score with personalized message
+🎓 EDUCATIONAL CONTENT STRUCTURE:
 
-🎨 VISUAL DESIGN (Implement in Tailwind):
-- BRIGHT gradients: bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400
-- LARGE text: text-3xl, text-4xl, font-bold for titles
-- FUN emojis throughout: 🎉 ⭐ 🚀 💡 ✨ 🎯 🏆 👏 📚 🎨
-- ROUNDED corners: rounded-2xl, rounded-3xl
-- DEEP shadows: shadow-2xl
-- ANIMATIONS: hover:scale-105 transition-transform duration-200
-- COLORFUL buttons: bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 text-xl
+For QUIZZES (5-10 questions):
+\`\`\`typescript
+const quizData = [
+  {
+    question: "Clear question text",
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    correctAnswer: 1, // index of correct option
+    explanation: "Why this answer is correct"
+  }
+];
+\`\`\`
 
-🏗️ CODE STRUCTURE:
+For TUTORIALS (3-5 steps):
+\`\`\`typescript
+const steps = [
+  {
+    title: "Step 1: Learn This",
+    content: "Explanation of the concept",
+    example: "Example showing the concept",
+    practice: "Try this yourself"
+  }
+];
+\`\`\`
+
+For PRACTICE (5-10 problems):
+\`\`\`typescript
+const problems = [
+  {
+    problem: "Solve: 5 + 3 = ?",
+    answer: "8",
+    hint: "Add the two numbers",
+    solution: "5 + 3 = 8"
+  }
+];
+\`\`\`
+
+🎨 VISUAL DESIGN (Keep it Simple & Colorful):
+- Background: \`bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen p-8\`
+- Container: \`max-w-4xl mx-auto\`
+- Cards: \`bg-white rounded-2xl shadow-xl p-8\`
+- Titles: \`text-4xl font-bold text-purple-600 mb-6\`
+- Buttons: \`bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:scale-105 transition-all text-lg font-semibold shadow-lg\`
+- Emojis: Use liberally: 🎉 ⭐ 🚀 💡 ✨ 🎯 🏆 👏
+
+🎮 INTERACTION PATTERNS:
+
+Quiz Pattern:
+\`\`\`typescript
+const [currentQ, setCurrentQ] = useState(0);
+const [score, setScore] = useState(0);
+const [showResult, setShowResult] = useState(false);
+
+const handleAnswer = (selectedIndex: number) => {
+  if (selectedIndex === questions[currentQ].correctAnswer) {
+    setScore(score + 1);
+  }
+  if (currentQ < questions.length - 1) {
+    setCurrentQ(currentQ + 1);
+  } else {
+    setShowResult(true);
+  }
+};
+\`\`\`
+
+Tutorial Pattern:
+\`\`\`typescript
+const [step, setStep] = useState(0);
+const [completed, setCompleted] = useState<boolean[]>(new Array(steps.length).fill(false));
+
+const nextStep = () => {
+  const newCompleted = [...completed];
+  newCompleted[step] = true;
+  setCompleted(newCompleted);
+  if (step < steps.length - 1) setStep(step + 1);
+};
+\`\`\`
+
+📚 CONTENT QUALITY:
+1. Make content age-appropriate and meaningful
+2. Include 5+ questions/steps/problems (not just 2-3)
+3. Provide clear explanations for all answers
+4. Show progress (e.g., "Question 3 of 10")
+5. Celebrate completion with encouraging message
+6. Include retry/restart option
+
+🏗️ REQUIRED STRUCTURE:
+\`\`\`typescript
 'use client';
 
 import React, { useState } from 'react';
 
 export default function LessonComponent() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [score, setScore] = useState(0);
-  const [showFeedback, setShowFeedback] = useState(false);
+  // 1. Define all data first (arrays of objects)
+  const data = [ /* content here */ ];
   
-  // Lesson content with educational value
-  const content = [
-    { question: "...", answer: "...", explanation: "..." },
-    // More structured content
-  ];
+  // 2. Define state
+  const [index, setIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  
+  // 3. Define handlers
+  const handleNext = () => {
+    if (index < data.length - 1) setIndex(index + 1);
+  };
+  
+  // 4. Render with safety checks
+  const current = data[index];
+  if (!current) return <div>Loading...</div>;
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Educational content with interactions */}
+        {/* Content here */}
       </div>
     </div>
   );
 }
+\`\`\`
 
-📚 CONTENT QUALITY CHECKLIST:
-✅ Teaches a specific, measurable skill or concept
-✅ Age-appropriate language and complexity
-✅ Provides explanations, not just answers
-✅ Includes multiple examples or practice problems
-✅ Offers hints and guidance
-✅ Celebrates progress and achievement
-✅ Reviews and reinforces learning at the end
-✅ Colorful and engaging visual design
-✅ Interactive elements that enhance learning
+❌ NEVER DO THIS:
+- Don't access array elements without checking length
+- Don't use properties without checking if object exists
+- Don't create complex nested states
+- Don't forget default/fallback values
+- Don't use external dependencies (only React & Tailwind)
 
-❌ AVOID:
-- Trivial questions without educational value
-- No explanations for answers
-- Single question then done
-- Boring presentation
-- No feedback or encouragement
-- Too easy or too hard without adjustment
+✅ ALWAYS DO THIS:
+- Check array bounds before access
+- Use optional chaining for nested properties
+- Keep state simple and flat
+- Provide fallback UI for edge cases
+- Test edge cases (first item, last item, empty)
 
-🎯 EXAMPLE TOPICS & APPROACH:
-- "Math quiz for 3rd graders": 10 addition/subtraction problems, show step-by-step solutions, track score
-- "Learn alphabet": Interactive A-Z with pictures, sounds, tracing, matching games
-- "US states geography": Map quiz with hints, capital cities, fun facts after each answer
-- "Multiplication tables": Practice 1-12, timed challenges, visual array representations
-- "Reading comprehension": Short story → questions → explanations of answers
-- "Science experiment": Step-by-step with images, explain WHY each step matters, quiz at end
-
-OUTPUT: Pure TypeScript/React code that creates meaningful, educational experiences!`,
+OUTPUT: Production-ready, bug-free TypeScript/React code!`,
         },
         {
           role: "user",
-          content: `Create a comprehensive, educational React component for: ${outline}
+          content: `Generate a complete, bug-free React component for: ${outline}
 
-Make it pedagogically sound with:
-1. Clear learning objectives
-2. Multiple practice opportunities  
-3. Explanations for all answers
-4. Progress tracking
-5. Encouraging feedback
-6. Age-appropriate content
+Requirements:
+1. Start with 'use client' immediately
+2. Define all data structures at the top with proper types
+3. Use defensive programming (check for undefined)
+4. Include 5+ meaningful questions/steps/problems
+5. Add progress tracking and encouraging feedback
+6. Make it colorful and engaging with Tailwind
+7. Ensure it's age-appropriate and educational
 
-Start with 'use client' immediately.`,
+Generate ONLY code, no explanations.`,
         },
       ],
       temperature: 0.7,
