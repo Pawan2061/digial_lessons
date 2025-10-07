@@ -1,3 +1,10 @@
+export interface GenerationTrace {
+  step: string;
+  timestamp: string;
+  details?: string;
+  error?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -7,7 +14,7 @@ export interface Lesson {
   created_at: string;
   ai_prompt?: string;
   ai_response?: string;
-  generation_trace?: any;
+  generation_trace?: GenerationTrace[];
   sandbox_id?: string;
   sandbox_url?: string;
   executed_at?: string;
@@ -24,7 +31,7 @@ export interface UpdateLessonRequest {
   status?: "generating" | "generated" | "failed";
   ai_prompt?: string;
   ai_response?: string;
-  generation_trace?: any;
+  generation_trace?: GenerationTrace[];
 }
 
 export interface ApiResponse<T> {

@@ -201,13 +201,13 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
             <h3 className="text-2xl font-semibold text-white mb-6">
               Your Lessons
             </h3>
-            <div className="space-y-4">
+            <div className="max-h-96 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-transparent">
               {lessons.map((lesson) => (
                 <Card
                   key={lesson.id}
                   className={`bg-white border-0 shadow-lg transition-all duration-200 ${
                     lesson.status === "generated"
-                      ? "hover:shadow-xl cursor-pointer"
+                      ? "hover:shadow-xl cursor-pointer hover:scale-105"
                       : ""
                   }`}
                   onClick={() =>
@@ -237,11 +237,15 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             lesson.status === "generating"
                               ? "bg-yellow-100 text-yellow-800"
+                              : lesson.status === "failed"
+                              ? "bg-red-100 text-red-800"
                               : "bg-green-100 text-green-800"
                           }`}
                         >
                           {lesson.status === "generating"
                             ? "Generating..."
+                            : lesson.status === "failed"
+                            ? "Failed"
                             : "Ready"}
                         </span>
                         {lesson.status === "generated" && (
