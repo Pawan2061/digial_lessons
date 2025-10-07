@@ -81,22 +81,29 @@ export default function LessonPage() {
   }, [lesson, params.id]);
 
   useEffect(() => {
-    if (!lesson?.sandbox_url || lesson.status !== "generated" || sandboxError)
-      return;
+    // Start countdown whenever lesson is generated (regardless of sandbox_url)
+    if (lesson?.status === "generated" && !sandboxError) {
+      setSandboxLoading(true);
+      setCountdown(15);
 
-    const countdownInterval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval);
-          setSandboxLoading(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            setSandboxLoading(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
-    return () => clearInterval(countdownInterval);
-  }, [lesson?.sandbox_url, lesson?.status, sandboxError]);
+      return () => clearInterval(countdownInterval);
+    } else if (lesson?.status !== "generated") {
+      // Reset countdown and loading state when lesson is not generated
+      setSandboxLoading(false);
+      setCountdown(15);
+    }
+  }, [lesson?.status, sandboxError]);
 
   const handleRecreateSandbox = async () => {
     if (!lesson?.content) return;
@@ -104,7 +111,7 @@ export default function LessonPage() {
     setRecreating(true);
     setSandboxError(false);
     setSandboxLoading(true);
-    setCountdown(15); // Increased from 10 to 15 seconds
+    setCountdown(15);
 
     try {
       const response = await fetch("/api/inngest", {

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
 
 interface Lesson {
   id: string;
@@ -23,12 +24,60 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
 
+  useEffect(() => {
+    const generatingLessons = lessons.filter(
+      (lesson) => lesson.status === "generating"
+    );
+
+    if (generatingLessons.length === 0) return;
+
+    const pollInterval = setInterval(async () => {
+      for (const lesson of generatingLessons) {
+        try {
+          const response = await fetch(`/api/lessons/${lesson.id}`);
+          if (response.ok) {
+            const data = await response.json();
+            const updatedLesson = data.lesson;
+
+            setLessons((prev) =>
+              prev.map((l) => (l.id === lesson.id ? updatedLesson : l))
+            );
+
+            if (updatedLesson.status === "generated") {
+              toast.success("Lesson is ready!", {
+                description: `"${updatedLesson.title}" is now available to view!`,
+                action: {
+                  label: "View Now",
+                  onClick: () => handleViewLesson(updatedLesson.id),
+                },
+              });
+            } else if (updatedLesson.status === "failed") {
+              toast.error("Lesson generation failed", {
+                description: `"${updatedLesson.title}" could not be generated. Please try again.`,
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error polling lesson status:", error);
+        }
+      }
+    }, 3000);
+
+    return () => clearInterval(pollInterval);
+  }, [lessons]);
+
   const handleGenerateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!outline.trim()) return;
 
     console.log("🔍 Starting lesson generation...");
     setIsGenerating(true);
+
+    toast.loading("Creating your amazing lesson...", {
+      id: "lesson-generation",
+      description:
+        "Our AI is working hard to create something special for you!",
+    });
 
     try {
       console.log("🔍 Making POST request to /api/lessons...");
@@ -64,15 +113,49 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
       setLessons((prev) => [lesson, ...prev]);
       setOutline("");
       setIsGenerating(false);
+
+      toast.success("Lesson created successfully!", {
+        id: "lesson-generation",
+        description:
+          "Your lesson is now being generated. Check back in a few moments!",
+      });
+
       console.log("✅ Lesson added to list successfully with initial status");
     } catch (error) {
       console.error("❌ Error creating lesson:", error);
       setIsGenerating(false);
+
+      toast.error("Failed to create lesson", {
+        id: "lesson-generation",
+        description:
+          "Please try again or contact support if the issue persists.",
+      });
     }
   };
 
   const handleViewLesson = (lessonId: string) => {
-    window.location.href = `/lessons/${lessonId}`;
+    toast.loading("Preparing your lesson...", {
+      id: "view-lesson",
+      description: "Opening lesson in 5 seconds...",
+    });
+
+    let countdown = 5;
+    const countdownInterval = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        toast.loading("Preparing your lesson...", {
+          id: "view-lesson",
+          description: `Opening lesson in ${countdown} seconds...`,
+        });
+      } else {
+        clearInterval(countdownInterval);
+        toast.success("Opening lesson!", {
+          id: "view-lesson",
+          description: "Redirecting to your interactive lesson...",
+        });
+        window.location.href = `/lessons/${lessonId}`;
+      }
+    }, 1000);
   };
 
   return (
