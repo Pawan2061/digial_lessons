@@ -63,15 +63,11 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
 
       setLessons((prev) => [lesson, ...prev]);
       setOutline("");
-      setIsGenerating(false); // Set to false immediately after API call returns
+      setIsGenerating(false);
       console.log("✅ Lesson added to list successfully with initial status");
-
-      // The actual status update from 'generating' to 'generated' will now come via real-time subscription
-      // The previous setTimeout simulation is removed as it's no longer needed with real AI generation
     } catch (error) {
       console.error("❌ Error creating lesson:", error);
       setIsGenerating(false);
-      // TODO: Show error message to user
     }
   };
 
@@ -201,7 +197,7 @@ export default function LandingPage({ initialLessons }: LandingPageProps) {
             <h3 className="text-2xl font-semibold text-white mb-6">
               Your Lessons
             </h3>
-            <div className="max-h-96 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-transparent">
+            <div className="max-h-96 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-purple-300 p-4 scrollbar-track-transparent">
               {lessons.map((lesson) => (
                 <Card
                   key={lesson.id}

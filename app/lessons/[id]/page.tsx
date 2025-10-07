@@ -207,17 +207,70 @@ export default function LessonPage() {
         {lesson.status === "generating" ? (
           <Card className="bg-white shadow-lg border-0">
             <CardContent className="py-16">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-6"></div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  Generating Your Lesson
+              <div className="text-center max-w-lg mx-auto">
+                {/* Animated Character */}
+                <div className="relative w-40 h-40 mx-auto mb-8">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-8xl animate-bounce">🤖</div>
+                  </div>
+                  {/* Floating stars around the character */}
+                  <div className="absolute top-4 left-4 text-2xl animate-ping">
+                    ⭐
+                  </div>
+                  <div className="absolute top-8 right-6 text-xl animate-pulse">
+                    ✨
+                  </div>
+                  <div className="absolute bottom-6 left-6 text-lg animate-bounce">
+                    🌟
+                  </div>
+                  <div className="absolute bottom-4 right-4 text-xl animate-ping">
+                    💫
+                  </div>
+                </div>
+
+                <h3 className="text-3xl font-bold text-purple-700 mb-4 animate-pulse">
+                  🎉 Creating Your Amazing Lesson! 🎉
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  AI is creating an interactive lesson for:{" "}
-                  <strong>{lesson.outline}</strong>
+                <p className="text-lg text-gray-700 mb-6">
+                  Our smart AI robot is working hard to create something special
+                  for:{" "}
+                  <strong className="text-purple-600">{lesson.outline}</strong>
                 </p>
+
+                {/* Fun Progress Steps */}
+                <div className="space-y-3 text-left bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg border-4 border-blue-200 mb-6">
+                  <div className="flex items-center text-blue-600">
+                    <span className="text-2xl mr-3 animate-spin">🧠</span>
+                    <span className="text-lg font-semibold">
+                      AI is thinking of fun ideas...
+                    </span>
+                  </div>
+                  <div className="flex items-center text-purple-600">
+                    <span className="text-2xl mr-3 animate-pulse">🎨</span>
+                    <span className="text-lg font-semibold">
+                      Adding colors and animations...
+                    </span>
+                  </div>
+                  <div className="flex items-center text-green-600">
+                    <span className="text-2xl mr-3 animate-bounce">🎮</span>
+                    <span className="text-lg font-semibold">
+                      Making it super interactive...
+                    </span>
+                  </div>
+                </div>
+
+                {/* Fun Facts */}
+                <div className="bg-gradient-to-r from-green-200 to-blue-200 rounded-xl p-4 mb-6">
+                  <p className="text-sm text-gray-700 font-medium">
+                    ⚡ <strong>Cool Fact:</strong> Our AI can create thousands
+                    of different lesson ideas in just seconds! It&apos;s like
+                    having a super creative teacher that never gets tired! 🚀
+                  </p>
+                </div>
+
                 <p className="text-sm text-gray-500">
-                  This usually takes 20-40 seconds...
+                  This usually takes 20-40 seconds... Perfect time to do a
+                  little dance! 💃
                 </p>
               </div>
             </CardContent>
@@ -269,65 +322,56 @@ export default function LessonPage() {
             </CardHeader>
             <CardContent>
               {sandboxError ? (
-                <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-xl p-12 border-2 border-orange-200">
-                  <div className="max-w-md mx-auto text-center">
-                    <div className="text-orange-500 mb-6">
-                      <svg
-                        className="w-20 h-20 mx-auto"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                      Sandbox Expired 😴
+                <div className="bg-gradient-to-br from-orange-100 to-yellow-100 rounded-2xl p-12 border-4 border-orange-300">
+                  <div className="max-w-lg mx-auto text-center">
+                    <div className="text-8xl mb-6 animate-bounce">🤖</div>
+                    <h3 className="text-3xl font-bold text-orange-600 mb-4">
+                      Oops! Our robot helpers need a break! 🤖
                     </h3>
-                    <p className="text-gray-700 mb-6 leading-relaxed">
-                      This lesson&apos;s sandbox has stopped running. Don&apos;t
-                      worry - we can restart it with one click!
+                    <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+                      Sometimes our magical learning machines get a little tired
+                      and need to restart. Don&apos;t worry - this happens to
+                      everyone!
                     </p>
+
+                    <div className="bg-white rounded-2xl p-6 shadow-lg border-4 border-orange-200 mb-6">
+                      <p className="text-gray-700 mb-4">
+                        <span className="text-2xl mr-2">💡</span>
+                        <strong>What happened?</strong> Our lesson builder is
+                        taking a little longer than usual to get ready.
+                      </p>
+                      <p className="text-gray-600">
+                        <span className="text-2xl mr-2">🔄</span>
+                        Let&apos;s give it another try!
+                      </p>
+                    </div>
+
                     <Button
                       onClick={handleRecreateSandbox}
                       disabled={recreating}
-                      className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
                     >
                       {recreating ? (
                         <span className="flex items-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                          Restarting...
+                          <div className="animate-spin mr-3 text-2xl">🎪</div>
+                          <span>Our helpers are working hard...</span>
                         </span>
                       ) : (
-                        <>🚀 Restart Sandbox</>
+                        <span className="flex items-center">
+                          <span className="text-2xl mr-2">🚀</span>
+                          <span>Let&apos;s Try Again!</span>
+                        </span>
                       )}
                     </Button>
-                    <p className="text-sm text-gray-500 mt-4">
-                      Takes about 30-60 seconds
-                    </p>
+
+                    <div className="mt-6 bg-gradient-to-r from-blue-200 to-purple-200 rounded-xl p-4">
+                      <p className="text-sm text-gray-700">
+                        <span className="text-xl mr-2">⏰</span>
+                        <strong>Don&apos;t worry!</strong> This usually takes
+                        about 30-60 seconds. Perfect time to do a little dance!
+                        💃
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -336,108 +380,80 @@ export default function LessonPage() {
                   style={{ height: "700px" }}
                 >
                   {sandboxLoading ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 z-10">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 z-10">
                       <div className="text-center max-w-lg px-6">
-                        <div className="relative w-32 h-32 mx-auto mb-8">
-                          <svg className="w-32 h-32 transform -rotate-90">
-                            <circle
-                              cx="64"
-                              cy="64"
-                              r="56"
-                              stroke="#e5e7eb"
-                              strokeWidth="8"
-                              fill="none"
-                            />
-                            <circle
-                              cx="64"
-                              cy="64"
-                              r="56"
-                              stroke="#7c3aed"
-                              strokeWidth="8"
-                              fill="none"
-                              strokeDasharray={`${
-                                (countdown / 10) * 351.86
-                              } 351.86`}
-                              className="transition-all duration-1000 ease-linear"
-                            />
-                          </svg>
+                        {/* Animated Character */}
+                        <div className="relative w-40 h-40 mx-auto mb-8">
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="text-5xl font-bold text-purple-600">
-                                {countdown}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                seconds
-                              </div>
-                            </div>
+                            <div className="text-8xl animate-bounce">🎨</div>
+                          </div>
+                          <div className="absolute top-4 left-4 text-2xl animate-ping">
+                            ⭐
+                          </div>
+                          <div className="absolute top-8 right-6 text-xl animate-pulse">
+                            ✨
+                          </div>
+                          <div className="absolute bottom-6 left-6 text-lg animate-bounce">
+                            🌟
+                          </div>
+                          <div className="absolute bottom-4 right-4 text-xl animate-ping">
+                            💫
                           </div>
                         </div>
 
-                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                          Starting Your Sandbox
+                        <h3 className="text-3xl font-bold text-purple-700 mb-4 animate-pulse">
+                          🎉 Getting Your Lesson Ready! 🎉
                         </h3>
-                        <p className="text-gray-600 mb-4">
-                          We&apos;re booting up the Next.js dev server and
-                          compiling your interactive lesson...
+                        <p className="text-lg text-gray-700 mb-6">
+                          Our magical learning helpers are preparing something
+                          amazing for you!
                         </p>
 
-                        <div className="space-y-2 text-sm text-left bg-white rounded-lg p-4 shadow-sm">
+                        {/* Fun Progress Steps */}
+                        <div className="space-y-3 text-left bg-white rounded-2xl p-6 shadow-lg border-4 border-yellow-200">
                           <div className="flex items-center text-green-600">
-                            <svg
-                              className="w-5 h-5 mr-2"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span>Lesson generated</span>
+                            <span className="text-2xl mr-3">✅</span>
+                            <span className="text-lg font-semibold">
+                              Lesson created with love!
+                            </span>
                           </div>
                           <div className="flex items-center text-green-600">
-                            <svg
-                              className="w-5 h-5 mr-2"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            <span>Sandbox created (24hr lifetime)</span>
+                            <span className="text-2xl mr-3">🏗️</span>
+                            <span className="text-lg font-semibold">
+                              Building your interactive playground!
+                            </span>
                           </div>
                           <div className="flex items-center text-purple-600">
-                            <svg
-                              className="animate-spin w-5 h-5 mr-2"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                            <span>Starting dev server & compiling...</span>
+                            <span className="text-2xl mr-3 animate-spin">
+                              🎪
+                            </span>
+                            <span className="text-lg font-semibold">
+                              Adding fun animations and colors...
+                            </span>
                           </div>
                         </div>
 
-                        <p className="text-xs text-gray-500 mt-6">
-                          💡 First-time loads may take a bit longer while
-                          everything initializes
-                        </p>
+                        {/* Fun Facts */}
+                        <div className="mt-6 bg-gradient-to-r from-yellow-200 to-pink-200 rounded-xl p-4">
+                          <p className="text-sm text-gray-700 font-medium">
+                            🧠 <strong>Fun Fact:</strong> Did you know that
+                            learning with colors and animations helps your brain
+                            remember things better? That&apos;s why we make
+                            everything so colorful! 🌈
+                          </p>
+                        </div>
+
+                        {/* Countdown with fun message */}
+                        <div className="mt-6">
+                          <div className="text-4xl font-bold text-purple-600 mb-2">
+                            {countdown}
+                          </div>
+                          <p className="text-gray-600">
+                            {countdown > 5
+                              ? "Almost ready!"
+                              : "Just a few more seconds!"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -488,33 +504,75 @@ export default function LessonPage() {
         ) : (
           <Card className="bg-white shadow-lg border-0">
             <CardContent className="py-16">
-              <div className="text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg
-                    className="mx-auto h-16 w-16"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
+              <div className="text-center max-w-lg mx-auto">
+                {/* Animated Character */}
+                <div className="relative w-40 h-40 mx-auto mb-8">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-8xl animate-bounce">🎨</div>
+                  </div>
+                  {/* Floating stars around the character */}
+                  <div className="absolute top-4 left-4 text-2xl animate-ping">
+                    ⭐
+                  </div>
+                  <div className="absolute top-8 right-6 text-xl animate-pulse">
+                    ✨
+                  </div>
+                  <div className="absolute bottom-6 left-6 text-lg animate-bounce">
+                    🌟
+                  </div>
+                  <div className="absolute bottom-4 right-4 text-xl animate-ping">
+                    💫
+                  </div>
                 </div>
-                <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                  No Sandbox URL Available
+
+                <h3 className="text-3xl font-bold text-purple-700 mb-4 animate-pulse">
+                  🎉 Getting Your Lesson Ready! 🎉
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  This lesson doesn&apos;t have a sandbox URL yet.
+                <p className="text-lg text-gray-700 mb-6">
+                  Our magical learning helpers are preparing something amazing
+                  for you!
                 </p>
+
+                {/* Fun Progress Steps */}
+                <div className="space-y-3 text-left bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg border-4 border-purple-200 mb-6">
+                  <div className="flex items-center text-green-600">
+                    <span className="text-2xl mr-3">✅</span>
+                    <span className="text-lg font-semibold">
+                      Lesson created with love!
+                    </span>
+                  </div>
+                  <div className="flex items-center text-purple-600">
+                    <span className="text-2xl mr-3 animate-spin">🎪</span>
+                    <span className="text-lg font-semibold">
+                      Building your interactive playground...
+                    </span>
+                  </div>
+                  <div className="flex items-center text-blue-600">
+                    <span className="text-2xl mr-3 animate-pulse">🎨</span>
+                    <span className="text-lg font-semibold">
+                      Adding fun animations and colors...
+                    </span>
+                  </div>
+                </div>
+
+                {/* Fun Facts */}
+                <div className="bg-gradient-to-r from-yellow-200 to-pink-200 rounded-xl p-4 mb-6">
+                  <p className="text-sm text-gray-700 font-medium">
+                    🧠 <strong>Fun Fact:</strong> Did you know that learning
+                    with colors and animations helps your brain remember things
+                    better? That&apos;s why we make everything so colorful! 🌈
+                  </p>
+                </div>
+
+                {/* Auto-refresh button */}
                 <Button
                   onClick={() => window.location.reload()}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
                 >
-                  Refresh Page
+                  <span className="flex items-center">
+                    <span className="text-2xl mr-2">🔄</span>
+                    <span>Check Again</span>
+                  </span>
                 </Button>
               </div>
             </CardContent>
