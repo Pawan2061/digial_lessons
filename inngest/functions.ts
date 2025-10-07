@@ -163,7 +163,7 @@ function cleanGeneratedCode(content: string): string {
         trimmed.startsWith("The") ||
         trimmed.startsWith("A ") ||
         trimmed.startsWith("An ") ||
-        trimmed.match(/^[A-Z][a-z]+ [a-z]/)); // Sentence-like pattern
+        trimmed.match(/^[A-Z][a-z]+ [a-z]/));
 
     if (looksLikeExplanation) {
       console.log("🧹 Removed explanation line:", trimmed.substring(0, 80));
