@@ -81,29 +81,22 @@ export default function LessonPage() {
   }, [lesson, params.id]);
 
   useEffect(() => {
-    // Start countdown whenever lesson is generated (regardless of sandbox_url)
-    if (lesson?.status === "generated" && !sandboxError) {
-      setSandboxLoading(true);
-      setCountdown(15);
+    if (!lesson?.sandbox_url || lesson.status !== "generated" || sandboxError)
+      return;
 
-      const countdownInterval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(countdownInterval);
-            setSandboxLoading(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setSandboxLoading(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-      return () => clearInterval(countdownInterval);
-    } else if (lesson?.status !== "generated") {
-      // Reset countdown and loading state when lesson is not generated
-      setSandboxLoading(false);
-      setCountdown(15);
-    }
-  }, [lesson?.status, sandboxError]);
+    return () => clearInterval(countdownInterval);
+  }, [lesson?.sandbox_url, lesson?.status, sandboxError]);
 
   const handleRecreateSandbox = async () => {
     if (!lesson?.content) return;
@@ -215,10 +208,12 @@ export default function LessonPage() {
           <Card className="bg-white shadow-lg border-0">
             <CardContent className="py-16">
               <div className="text-center max-w-lg mx-auto">
+                {/* Animated Character */}
                 <div className="relative w-40 h-40 mx-auto mb-8">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-8xl animate-bounce">🤖</div>
                   </div>
+                  {/* Floating stars around the character */}
                   <div className="absolute top-4 left-4 text-2xl animate-ping">
                     ⭐
                   </div>
@@ -242,6 +237,7 @@ export default function LessonPage() {
                   <strong className="text-purple-600">{lesson.outline}</strong>
                 </p>
 
+                {/* Fun Progress Steps */}
                 <div className="space-y-3 text-left bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg border-4 border-blue-200 mb-6">
                   <div className="flex items-center text-blue-600">
                     <span className="text-2xl mr-3 animate-spin">🧠</span>
@@ -263,6 +259,7 @@ export default function LessonPage() {
                   </div>
                 </div>
 
+                {/* Fun Facts */}
                 <div className="bg-gradient-to-r from-green-200 to-blue-200 rounded-xl p-4 mb-6">
                   <p className="text-sm text-gray-700 font-medium">
                     ⚡ <strong>Cool Fact:</strong> Our AI can create thousands
@@ -370,9 +367,9 @@ export default function LessonPage() {
                     <div className="mt-6 bg-gradient-to-r from-blue-200 to-purple-200 rounded-xl p-4">
                       <p className="text-sm text-gray-700">
                         <span className="text-xl mr-2">⏰</span>
-                        <strong>Don&apos;t worry!</strong> We&apos;re giving it
-                        15 seconds to get ready. Perfect time to do a little
-                        dance! 💃
+                        <strong>Don&apos;t worry!</strong> This usually takes
+                        about 30-60 seconds. Perfect time to do a little dance!
+                        💃
                       </p>
                     </div>
                   </div>
@@ -385,6 +382,7 @@ export default function LessonPage() {
                   {sandboxLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 z-10">
                       <div className="text-center max-w-lg px-6">
+                        {/* Animated Character */}
                         <div className="relative w-40 h-40 mx-auto mb-8">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-8xl animate-bounce">🎨</div>
@@ -411,6 +409,7 @@ export default function LessonPage() {
                           amazing for you!
                         </p>
 
+                        {/* Fun Progress Steps */}
                         <div className="space-y-3 text-left bg-white rounded-2xl p-6 shadow-lg border-4 border-yellow-200">
                           <div className="flex items-center text-green-600">
                             <span className="text-2xl mr-3">✅</span>
@@ -434,6 +433,7 @@ export default function LessonPage() {
                           </div>
                         </div>
 
+                        {/* Fun Facts */}
                         <div className="mt-6 bg-gradient-to-r from-yellow-200 to-pink-200 rounded-xl p-4">
                           <p className="text-sm text-gray-700 font-medium">
                             🧠 <strong>Fun Fact:</strong> Did you know that
@@ -443,14 +443,13 @@ export default function LessonPage() {
                           </p>
                         </div>
 
+                        {/* Countdown with fun message */}
                         <div className="mt-6">
                           <div className="text-4xl font-bold text-purple-600 mb-2">
                             {countdown}
                           </div>
                           <p className="text-gray-600">
-                            {countdown > 10
-                              ? "Getting everything ready..."
-                              : countdown > 5
+                            {countdown > 5
                               ? "Almost ready!"
                               : "Just a few more seconds!"}
                           </p>
@@ -506,10 +505,12 @@ export default function LessonPage() {
           <Card className="bg-white shadow-lg border-0">
             <CardContent className="py-16">
               <div className="text-center max-w-lg mx-auto">
+                {/* Animated Character */}
                 <div className="relative w-40 h-40 mx-auto mb-8">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-8xl animate-bounce">🎨</div>
                   </div>
+                  {/* Floating stars around the character */}
                   <div className="absolute top-4 left-4 text-2xl animate-ping">
                     ⭐
                   </div>
@@ -532,6 +533,7 @@ export default function LessonPage() {
                   for you!
                 </p>
 
+                {/* Fun Progress Steps */}
                 <div className="space-y-3 text-left bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 shadow-lg border-4 border-purple-200 mb-6">
                   <div className="flex items-center text-green-600">
                     <span className="text-2xl mr-3">✅</span>
@@ -553,7 +555,7 @@ export default function LessonPage() {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-yellow-200 to-pink-200 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-yellow-200 to-pink-200 rounded-xl p-4 mb-6">
                   <p className="text-sm text-gray-700 font-medium">
                     🧠 <strong>Fun Fact:</strong> Did you know that learning
                     with colors and animations helps your brain remember things
@@ -561,18 +563,15 @@ export default function LessonPage() {
                   </p>
                 </div>
 
-                <div className="mt-6">
-                  <div className="text-4xl font-bold text-purple-600 mb-2">
-                    {countdown}
-                  </div>
-                  <p className="text-gray-600">
-                    {countdown > 10
-                      ? "Getting everything ready..."
-                      : countdown > 5
-                      ? "Almost ready!"
-                      : "Just a few more seconds!"}
-                  </p>
-                </div>
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
+                  <span className="flex items-center">
+                    <span className="text-2xl mr-2">🔄</span>
+                    <span>Check Again</span>
+                  </span>
+                </Button>
               </div>
             </CardContent>
           </Card>
